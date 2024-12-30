@@ -1,0 +1,85 @@
+#!/bin/bash
+function IsSystem() {
+  local SearchedPackage=$1
+  for CurPackage in "${SysPackages[@]}"; do
+    if [[ ${SearchedPackage} == ${CurPackage} ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+function IsThird() {
+  local SearchedPackage=$1
+  for CurPackage in "${ThpPackages[@]}"; do
+    if [[ ${SearchedPackage} == ${CurPackage} ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+function IsDisabled() {
+  local SearchedPackage=$1
+  for CurPackage in "${DisabledPackages[@]}"; do
+    if [[ ${SearchedPackage} == ${CurPackage} ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+AllPackages=($(adb shell pm list packages -f -u | awk -F':' '{print $2}' | awk -F'.apk=' '{print $2 ":" $1 ".apk"}' | sort))
+AllCount=${#AllPackages[*]}
+
+SysPackages=($(adb shell pm list packages -s | awk -F':' '{print $2}' | sort))
+SysCount=${#SysPackages[*]}
+
+ThpPackages=($(adb shell pm list packages -3 | awk -F':' '{print $2}' | sort))
+ThpCount=${#ThpPackages[*]}
+
+DisabledPackages=($(adb shell pm list packages -d | awk -F':' '{print $2}' | sort))
+DisabledCount=${#DisabledPackages[*]}
+
+OtherCount=$(($AllCount - $SysCount - $ThpCount))
+
+echo 'Installed packages counts:'
+echo -e '├─ Total packages count: _____ \E[37;01;03m'$AllCount'\E[0m'
+echo -e '├─ System packages count: ____ \E[35;01;03m'$SysCount'\E[0m'
+echo -e '├─ Third party packages count: \E[32;01;03m'$ThpCount'\E[0m'
+echo -e '├─ Disabled packages count: __ \E[33;01;03m'$DisabledCount'\E[0m'
+echo -e '╰─ Uninstalled packages count: \E[31;01;03m'$OtherCount'\E[0m'
+
+
+echo 'Installed packages by type:'
+AllIndex=0
+LastIndex=$(($AllCount-1))
+for apk_pack in ${AllPackages[@]}; do
+  apk_id=$(echo $apk_pack | awk -F':' '{print $1}')
+  apk_path=$(echo $apk_pack | awk -F':' '{print $2}')
+  
+  if [[ $AllIndex = $LastIndex ]]; then
+    echo -n '╰─ '
+  else
+    echo -n '├─ '
+  fi
+  
+  if IsDisabled $apk_id ; then
+    echo -e -n '\E[33;01;03m'
+  elif IsSystem $apk_id ; then
+    echo -e -n '\E[35;01;03m'
+  elif IsThird $apk_id ; then
+    echo -e -n '\E[32;01;03m'
+  else
+    echo -e -n '\E[91;01;03m'
+  fi
+  echo -e $apk_id'\E[0m'
+
+if [[ $AllIndex = $LastIndex ]]; then
+    echo -e '   \E[37;02m'$apk_path'\E[0m'
+  else
+    echo -e '│  \E[37;02m'$apk_path'\E[0m'
+  fi
+  
+  AllIndex=$(($AllIndex+1))
+done

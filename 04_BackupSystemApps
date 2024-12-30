@@ -1,0 +1,30 @@
+#!/bin/bash
+for PacName in $(adb shell pm list packages | awk -F':' '{print $2}' | grep -o -E "[0-9a-zA-Z\.]+"); do
+   for PacFullPath in $(adb shell pm path $PacName | awk -F':' '{print $2}' | grep -o -E "[0-9a-zA-Z\.\/_-]+"); do
+      PacFile=$(basename $PacFullPath)
+      PacPath=$(dirname $PacFullPath)
+      PacDir=$(basename $PacPath)
+      if [[ $(echo $PacPath | grep -o "/data/app") != "" ]]; then 
+         if [[ ! -e "./app/"$PacDir"/"$PacFile ]]; then
+            mkdir -p "./app/"$PacDir
+            echo -e '\e[1;34m'$PacName'\e[0m: \e[1;35m'$PacPath' \e[1;32m'$PacFile'\e[0m'
+            adb pull $PacFullPath
+            mv $PacFile "./app/"$PacDir
+            echo " => OK"
+         else
+            echo -e '\e[1;34m'$PacName'\e[0m: \e[1;35m'$PacPath' \e[1;32m'$PacFile'\e[0m => SKIP'
+         fi
+      else
+         if [[ ! -e "."$PacFullPath ]]; then
+            echo -e '\e[1;34m'$PacName'\e[0m: \e[1;35m'$PacPath'\e[0m SYSTEM APP'
+            mkdir -p "."$PacPath
+            adb pull $PacFullPath
+            mv $PacFile "."$PacPath
+            echo " => OK"
+         else
+            echo -e '\e[1;34m'$PacName'\e[0m: \e[1;35m'$PacPath'\e[0m SYSTEM APP => SKIP'
+         fi
+      fi
+   done
+done
+
