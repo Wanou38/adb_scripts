@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+if [[ ! -f "./apps/f-droid.apk" ]] ; then
+  echo -e "You must download \E[32;01;03mf-droid.apk\E[0m first and put it in a dirrectory called \E[32;01mapps\E[0m"
+  exit 1
+fi
+
+echo "push apk in downloads"
+if adb push ./apps/f-droid.apk /storage/emulated/0/Download ; then
+  echo "install apk"
+  adb shell pm install /storage/emulated/0/Download/F-Droid.apk
+fi
