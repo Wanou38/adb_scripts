@@ -1,0 +1,65 @@
+﻿#!/bin/bash
+UninstallThis() {
+  InPackageName=$1
+  InAppName=$2
+  echo -e -n '  — \E[35;01;03m'$InPackageName'\E[34;01;03m '$InAppName'\E[0m : '
+  for CurPackage in "${PackagesList[@]}"; do
+    if [[ $CurPackage == $InPackageName ]]; then
+      echo -e '\E[31;01m✘\E[0m '"found: uninstall"
+      adb shell pm uninstall --user 0 $InPackageName
+      return 0
+    fi
+  done
+  echo -e '\E[32;01m✔\E[0m '"not found"
+  return 1
+}
+
+#***********************
+#* Programme principal *
+#***********************
+#uninstall non system packages
+PackagesList=( $(adb shell pm list packages | awk -F':' '{print $2}' | sed 's/\r$//' | sort) )
+UninstallThis "cn.wps.moffice_eng" "WPS office"
+UninstallThis "com.kitty.blast.lucky.pet.game" "kitty blast"
+UninstallThis "com.bingo.night.vegas.slots" "bingo night"
+UninstallThis "com.wood.block.puzzle.winner.game" "block puzzle"
+UninstallThis "com.blackview.weather" "Blackview meteo"
+UninstallThis "com.google.android.apps.nbu.files" "Files by Google"
+
+#uninstall system packages
+PackagesList=( $(adb shell pm list packages -s | awk -F':' '{print $2}' | sed 's/\r$//' | sort) )
+# android base apps
+UninstallThis "com.android.chrome" "Chrome Browser"
+UninstallThis "com.android.fmradio" "FM radio"
+
+# google base apps
+UninstallThis "com.google.android.apps.docs" "Google Drive"
+UninstallThis "com.google.android.apps.fitness" "Google Fit"
+UninstallThis "com.google.android.apps.googleassistant" "Google Assistant"
+UninstallThis "com.google.android.apps.nbu.files" "Files by Google"
+UninstallThis "com.google.android.apps.photos" "Google photo"
+UninstallThis "com.google.android.apps.tachyon" "Google Duo"
+UninstallThis "com.google.android.apps.youtube.music" "Youtube Music"
+UninstallThis "com.google.android.calendar" "Google calendar app"
+UninstallThis "com.google.android.contacts" "Google contacts app"
+UninstallThis "com.google.android.feedback"
+UninstallThis "com.google.android.gm" "Gmail"
+UninstallThis "com.google.android.gms.location.history" "Google Play Tracking Location"
+UninstallThis "com.google.android.googlequicksearchbox" "Google Search Bar On Home Page"
+UninstallThis "com.google.android.keep" "Notes Keep"
+UninstallThis "com.google.android.marvin.talkback" "Talkback feature"
+UninstallThis "com.google.android.projection.gearhead" "Android Auto"
+UninstallThis "com.google.android.syncadapters.contacts" "Google contacts app"
+UninstallThis "com.google.android.videos" "Google films et séries"
+UninstallThis "com.google.android.youtube" "Youtube"
+
+# Blackview specific
+UninstallThis "com.facebook.appmanager" "Facebook"
+UninstallThis "com.facebook.services" "Facebook"
+UninstallThis "com.facebook.system" "Facebook"
+UninstallThis "com.toycrushfever.bitfungame.free" "Toy Crush Fever"
+UninstallThis "com.opera.preinstall" "Opera browser preinstall"
+UninstallThis "com.opera.browser" "Opera browser"
+
+echo "Done!"
+

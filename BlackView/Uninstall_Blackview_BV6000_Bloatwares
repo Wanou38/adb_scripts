@@ -1,0 +1,62 @@
+#!/bin/bash
+UninstallThis() {
+  InPackageName=$1
+  InAppName=$2
+  echo -e -n '  — \E[35;01;03m'$InPackageName'\E[34;01;03m '$InAppName'\E[0m : '
+  for CurPackage in "${PackagesList[@]}"; do
+    if [[ $CurPackage == $InPackageName ]]; then
+      echo -e '\E[31;01m✘\E[0m '"found: uninstall"
+      adb shell pm uninstall --user 0 $InPackageName
+      return 0
+    fi
+  done
+  echo -e '\E[32;01m✔\E[0m '"not found"
+  return 1
+}
+
+#***********************
+#* Programme principal *
+#***********************
+#uninstall non system packages
+PackagesList=( $(adb shell pm list packages | awk -F':' '{print $2}' | sed 's/\r$//' | sort) )
+#UninstallThis "com.blackview.weather" "Blackview meteo"
+
+#uninstall system packages
+PackagesList=( $(adb shell pm list packages -s | awk -F':' '{print $2}' | sed 's/\r$//' | sort) )
+# android base apps
+UninstallThis "com.android.quicksearchbox" "Android search bar"
+UninstallThis "com.android.fmradio" "FM radio"
+UninstallThis "com.android.music" "android basic music app"
+UninstallThis "com.android.musicfx" "androdi basic music app"
+UninstallThis "com.android.soundrecorder" "android basic sound recorder"
+UninstallThis "com.android.calculator2" "android calculator 2"
+UninstallThis "com.android.chrome" "Chrome Browser"
+UninstallThis "com.android.browser" "Basic Browser"
+UninstallThis "com.android.email" "Email basic app"
+UninstallThis "com.android.vending" "Play store"
+
+# google base apps
+UninstallThis "com.google.android.googlequicksearchbox" "Google Search Bar On Home Page"
+UninstallThis "com.google.android.talk" "Google talk"
+UninstallThis "com.google.android.youtube" "Youtube"
+UninstallThis "com.google.android.videos" "Google films et séries"
+UninstallThis "com.google.android.music" "Google music"
+UninstallThis "com.google.android.feedback"
+UninstallThis "com.google.android.tts" "Google speech recognition & synthesis"
+UninstallThis "com.google.android.apps.tachyon" "Google Duo"
+UninstallThis "com.google.android.gm" "Gmail"
+#UninstallThis "com.google.android.gms" "Gmail service: needed for Google play!" # needed for Google play and playstore
+UninstallThis "com.google.android.apps.docs" "Google Drive"
+UninstallThis "com.google.android.apps.youtube.music" "Youtube Music"
+UninstallThis "com.google.android.apps.maps" "Google Maps"
+UninstallThis "com.google.android.apps.photos" "Google Photo"
+UninstallThis "com.google.android.syncadapters.calendar" "Google calendar online sync"
+UninstallThis "com.google.android.syncadapters.contacts" "Google contacts app"
+
+# Blackview specific
+UninstallThis "com.kikaoem.qisiemoji.inputmethod" "Kika keyboard"
+UninstallThis "com.mediatek.videoplayer" "Mediatek video player"
+#UninstallThis "com.mediatek.datatransfer" "Mediatek save and restore" # local save and restore on  SD card: this app is usefull
+
+echo "Done!"
+

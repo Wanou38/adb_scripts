@@ -1,0 +1,68 @@
+﻿#!/bin/bash
+UninstallThis() {
+  InPackageName=$1
+  InAppName=$2
+  echo -e -n '  — \E[35;01;03m'$InPackageName'\E[34;01;03m '$InAppName'\E[0m : '
+  for CurPackage in "${PackagesList[@]}"; do
+    if [[ $CurPackage == $InPackageName ]]; then
+      echo -e '\E[31;01m✘\E[0m '"found: uninstall"
+      adb shell pm uninstall --user 0 $InPackageName
+      return 0
+    fi
+  done
+  echo -e '\E[32;01m✔\E[0m '"not found"
+  return 1
+}
+
+#***********************
+#* Programme principal *
+#***********************
+#uninstall non system packages
+PackagesList=( $(adb shell pm list packages | awk -F':' '{print $2}' | sed 's/\r$//') )
+UninstallThis "com.blackview.weather" "Blackview meteo"
+UninstallThis "com.google.android.apps.nbu.files" "Files by Google"
+
+#uninstall system packages
+PackagesList=( $(adb shell pm list packages -s | awk -F':' '{print $2}' | sed 's/\r$//') )
+# basic android apps
+UninstallThis "com.android.fmradio" "FM radio"
+UninstallThis "com.android.music" "android basic music app"
+UninstallThis "com.android.musicfx" "androdi basic music app"
+UninstallThis "com.android.soundrecorder" "android basic sound recorder"
+UninstallThis "com.android.calculator2" "android calculator"
+UninstallThis "com.android.deskclock" "android desktop clock"
+UninstallThis "com.android.protips" "tips for welcome screen"
+UninstallThis "com.android.contacts" "android base contacts app"
+UninstallThis "com.android.dialer" "android base dialer app"
+#UninstallThis "com.android.phone" "android base phone app" # do not remove this app!!!
+#UninstallThis "com.android.documentsui" "android base file browse app" # you should not uninstall this one
+
+# google apps
+UninstallThis "com.google.android.googlequicksearchbox" "Google Search Bar On Home Page"
+UninstallThis "com.google.android.youtube" "Youtube"
+UninstallThis "com.google.android.videos" "Google films et séries"
+UninstallThis "com.google.android.feedback"
+UninstallThis "com.google.android.marvin.talkback" "Talkback feature"
+UninstallThis "com.google.android.apps.tachyon" "Google Duo"
+UninstallThis "com.google.android.gm" "Gmail"
+UninstallThis "com.google.android.gms.location.history" "Google Play Tracking Location"
+UninstallThis "com.google.android.apps.docs" "Google Drive"
+UninstallThis "com.google.android.apps.youtube.music" "Youtube Music"
+UninstallThis "com.google.android.apps.fitness" "Google Fit"
+UninstallThis "com.google.android.apps.photos" "Google gallery"
+UninstallThis "com.google.android.apps.googleassistant" "Google Assistant"
+UninstallThis "com.google.android.music" "Google Play Music"
+UninstallThis "com.google.android.apps.maps" "Google Maps"
+UninstallThis "com.google.android.calendar" "Google calendar"
+UninstallThis "com.google.android.apps.messaging" "Google Messages"
+UninstallThis "com.google.android.syncadapters.contacts" "Google contacts sync"
+UninstallThis "com.google.android.inputmethod.latin" "Google Gboard"
+
+# Blackview system apps
+UninstallThis "com.app.odm.supernote" "supernote"
+UninstallThis "com.odm.tool" "Toolbag"
+
+#to reinstall base app:
+# adb shell cmd package install-existing com.android.phone
+
+echo "Done!"
