@@ -1,0 +1,22 @@
+﻿#!/bin/bash
+UninstallThis() {
+  InPackageName=$1
+  InAppName=$2
+  echo -e -n '  — \E[35;01;03m'$InPackageName'\E[34;01;03m '$InAppName'\E[0m : '
+  for CurPackage in "${PackagesList[@]}"; do
+    if [[ $CurPackage == $InPackageName ]]; then
+      echo -e '\E[31;01m✘\E[0m '"found: uninstall"
+      adb shell pm uninstall --user 0 $InPackageName
+      return 0
+    fi
+  done
+  echo -e '\E[32;01m✔\E[0m '"not found"
+  return 1
+}
+
+PackagesList=( $(adb shell pm list packages -s | awk -F':' '{print $2}' | sed 's/\r$//') )
+
+UninstallThis "com.google.android.projection.gearhead" "Android Auto"
+
+echo "Done!"
+
