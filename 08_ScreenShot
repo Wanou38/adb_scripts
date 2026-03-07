@@ -1,0 +1,6 @@
+#!/bin/bash
+DateString=$(date "+%F_%Hh%Mm%Ss")
+FullPath="/sdcard/"$DateString".png"
+adb shell screencap $FullPath
+adb pull $FullPath
+adb shell rm -f $FullPath

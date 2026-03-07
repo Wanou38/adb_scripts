@@ -1,0 +1,9 @@
+#!/bin/bash
+DateString=$(date "+%F_%Hh%Mm%Ss")
+FullPath="/sdcard/Download/"$DateString".mp4"
+adb shell screenrecord --verbose --time-limit 180 $FullPath
+adb pull $FullPath
+adb shell rm -f $FullPath
+
+
+
