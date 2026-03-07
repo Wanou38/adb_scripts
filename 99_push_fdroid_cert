@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+adb push ./isrgrootx1.pem /storage/emulated/0/Download
